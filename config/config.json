@@ -1,0 +1,106 @@
+{
+  "seed": 1337,
+  "batch_size": 2024,
+  "epochs": 75,
+  "single_class": false,
+  "binary": false,
+  "liner": {
+    "config": "/home/michal/dev/ipi/sytuacje/liner2_models/baseline/cfg.ini"
+  },
+  "w2v_embeddings": {
+    "orth": {
+      "path": "/home/michal/dev/ipi/embeddings/orth/w2v_allwiki_nkjpfull_300.model",
+      "enabled": true,
+      "attributes": [
+        "orth"
+      ]
+    },
+    "lemma": {
+      "path": "/home/michal/dev/ipi/embeddings/lemma/w2v_allwiki_nkjpfull_300.model",
+      "enabled": true,
+      "attributes": [
+        "base"
+      ]
+    },
+    "lemma.class": {
+      "path": "/home/michal/dev/ipi/embeddings/lemma.class/w2v_nkjp_kf_300_50i_5w.model",
+      "enabled": false,
+      "attributes": [
+        [
+          "base",
+          "class"
+        ]
+      ]
+    },
+    "lemma.ctag": {
+      "path": "/home/michal/dev/ipi/embeddings/lemma.ctag/w2v_nkjp_kf_300_50i_5w.model",
+      "enabled": false,
+      "attributes": [
+        [
+          "base",
+          "ctag"
+        ]
+      ]
+    },
+    "class": {
+      "path": "/home/michal/dev/ipi/embeddings/class/w2v_nkjp_kf_30_50i_5w.model",
+      "enabled": true,
+      "attributes": [
+        "class"
+      ]
+    },
+    "ctag": {
+      "path": "/home/michal/dev/ipi/embeddings/ctag/w2v_nkjp_kf_300_50i_5w.model",
+      "enabled": false,
+      "attributes": [
+        "ctag"
+      ]
+    },
+    "hypernym-1": {
+      "path": "/home/michal/dev/ipi/embeddings/hypernym-1/w2v_nkjp_kf_100_25i_5w.model",
+      "enabled": false,
+      "attributes": [
+        "hypernym-1"
+      ]
+    },
+    "synonym": {
+      "path": "/home/michal/dev/ipi/embeddings/synonym/w2v_nkjp_kf_100_25i_5w.model",
+      "enabled": false,
+      "attributes": [
+        "synonym"
+      ]
+    }
+  },
+  "ft_embeddings": {
+    "orth": {
+      "path": "/home/michal/dev/ipi/embeddings/orth/fasttext_nkjp_kf_st_300_50i_5w.model",
+      "enabled": false,
+      "attributes": [
+        "orth"
+      ]
+    },
+    "lemma": {
+      "path": "/home/michal/dev/ipi/embeddings/lemma/w2v_nkjp_kf_300_50i_5w.model",
+      "enabled": false,
+      "attributes": [
+        "base"
+      ]
+    }
+  },
+  "indexed_embeddings": [
+    [
+      "struct-P", 5
+    ]
+  ],
+  "position_embedding_dim": 3,
+  "validation_split": 0.2,
+  "window_size": 1,
+  "input_dropout": 0.4,
+  "lstm_units": 14,
+  "lstm_units2": 14,
+  "dense_units": 0,
+
+  "lr": 0.001,
+  "lr_decay": 1e-6
+
+}
