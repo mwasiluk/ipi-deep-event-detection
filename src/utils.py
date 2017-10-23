@@ -39,7 +39,6 @@ def sliding_window(iterable, left, right, padding=None, step=1):
         yield tuple(elements)
 
 
-
 def print_stats(y_true, y_pred, labels_index, binary):
     if not binary:
         y_true = map(lambda v: v.argmax(), y_true)
@@ -80,9 +79,28 @@ def print_p_r_f(p_r_f, labels_index):
     print("")
 
 
+def split(y_data, split_ratio, balanced=True):
+    if balanced:
+        return balanced_split(y_data, split_ratio)
+
+    return simple_split(y_data, split_ratio)
+
+
+def simple_split(y_data, split_ratio):
+
+    y1_target_len = split_ratio * len(y_data)
+    y1 = []
+    y2 = []
+    for i in range(len(y_data)):
+        if i < y1_target_len:
+            y1.append(i)
+        else:
+            y2.append(i)
+    return y1, y2
+
+
 def balanced_split(y_data, split_ratio):
     y_true = map(lambda v: v.argmax(), y_data)
-
 
     class_num = len(np.unique(y_true))
     print(class_num)
@@ -106,6 +124,7 @@ def balanced_split(y_data, split_ratio):
 
     print(y1_class_num_arr, y1_class_num_arr_curr)
     return y1, y2
+
 
 def mkdir_p(path):
     try:

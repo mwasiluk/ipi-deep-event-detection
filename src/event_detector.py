@@ -20,46 +20,7 @@ from liner2 import create_annotation, get_writer
 from utils import print_stats, mkdir_p, merge_several_folds_results, print_p_r_f, sliding_window
 
 
-BASE_DIR = '/home/michal/dev/ipi/'
 IRRELEVANT_CLASS = 'n/a'
-
-
-def train_model(model, config, training_data):
-    print('Training model.')
-    # compute balanced class weights
-    if config['binary']:
-        class_w = class_weight.compute_class_weight('balanced', np.array([0, 1]), training_data['y_train'])
-    else:
-        y_train_true = map(lambda v: v.argmax(), training_data['y_train'])
-        class_w = class_weight.compute_class_weight('balanced', np.unique(y_train_true), y_train_true)
-    print("Computed class weight:")
-    print(class_w)
-
-    saved_model_checkpoints_dir = '../saved_model_checkpoints'
-    mkdir_p(saved_model_checkpoints_dir)
-
-    mcp = ModelCheckpoint('%s/weights.best.hdf5' % saved_model_checkpoints_dir, monitor="val_acc",
-                          save_best_only=True, save_weights_only=False, verbose=1)
-
-    loss = 'categorical_crossentropy'
-    if config['binary']:
-        loss = 'binary_crossentropy'
-
-    train_inputs = [training_data['x_train'], training_data['x_train']]
-    val_inputs = [training_data['x_val'], training_data['x_val']]
-
-    model.compile(loss=loss,
-                  optimizer=optimizers.Adam(lr=config['lr'], decay=config['lr_decay']),
-                  metrics=['accuracy'])
-
-    model.fit(train_inputs, training_data['y_train'], shuffle=False,
-              batch_size=config['batch_size'],
-              epochs=config['epochs'],
-              validation_data=(val_inputs, training_data['y_val']),
-              class_weight=class_w,
-              callbacks=[mcp])
-
-    model.load_weights("%s/weights.best.hdf5" % saved_model_checkpoints_dir)
 
 
 def run(config, input_files_index = None, output_file=None, token_sequences_file_name=None, file_to_save_token_sequences=None, model_file=None, train=False, cv=False, input_format="batch:ccl", output_format="batch:ccl"):
@@ -76,7 +37,6 @@ def run(config, input_files_index = None, output_file=None, token_sequences_file
 
     if train:
         run_train(config, data, model_file)
-
     elif cv:
         run_cv(config, data, model_file)
     else:
@@ -126,9 +86,7 @@ def run_pipe(config, data, model_file, output_file, output_format):
                 x.append(data.get_vector_sequence(seq))
 
             y_pred = model.predict(branched_bi_gru_lstm.get_x(np.asarray(x)))
-
-            y_pred = map(lambda v: v.argmax(), y_pred)
-            y_pred = map(lambda v: labels_index_inverted[v], y_pred)
+            y_pred = map(lambda v: labels_index_inverted[v.argmax()], y_pred)
 
             for idx, a in enumerate(y_pred):
                 if a == data.irrelevant_class:
@@ -195,6 +153,44 @@ def run_train(config, data, model_file):
     model.summary()
     sys.stdout = sys.__stdout__
     model_summary = mystdout.getvalue()
+
+
+def train_model(model, config, training_data):
+    print('Training model.')
+    # compute balanced class weights
+    if config['binary']:
+        class_w = class_weight.compute_class_weight('balanced', np.array([0, 1]), training_data['y_train'])
+    else:
+        y_train_true = map(lambda v: v.argmax(), training_data['y_train'])
+        class_w = class_weight.compute_class_weight('balanced', np.unique(y_train_true), y_train_true)
+    print("Computed class weight:")
+    print(class_w)
+
+    saved_model_checkpoints_dir = '../saved_model_checkpoints'
+    mkdir_p(saved_model_checkpoints_dir)
+
+    mcp = ModelCheckpoint('%s/weights.best.hdf5' % saved_model_checkpoints_dir, monitor="val_acc",
+                          save_best_only=True, save_weights_only=False, verbose=1)
+
+    loss = 'categorical_crossentropy'
+    if config['binary']:
+        loss = 'binary_crossentropy'
+
+    train_inputs = [training_data['x_train'], training_data['x_train']]
+    val_inputs = [training_data['x_val'], training_data['x_val']]
+
+    model.compile(loss=loss,
+                  optimizer=optimizers.Adam(lr=config['lr'], decay=config['lr_decay']),
+                  metrics=['accuracy'])
+
+    model.fit(train_inputs, training_data['y_train'], shuffle=False,
+              batch_size=config['batch_size'],
+              epochs=config['epochs'],
+              validation_data=(val_inputs, training_data['y_val']),
+              class_weight=class_w,
+              callbacks=[mcp])
+
+    model.load_weights("%s/weights.best.hdf5" % saved_model_checkpoints_dir)
 
 
 def load_config(filename):

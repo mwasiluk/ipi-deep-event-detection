@@ -8,7 +8,7 @@ from keras.models import Sequential
 from keras.utils import to_categorical
 
 from liner2 import Liner2
-from utils import sliding_window, balanced_split
+from utils import sliding_window, balanced_split, split
 
 
 class Data(object):
@@ -167,7 +167,7 @@ class Data(object):
     def get_training_data(self, validation_split):
 
         num_samples = self.data[0].shape[0]
-        val_indices, train_indices = balanced_split(self.labels, validation_split)
+        train_indices, val_indices = split(self.labels, 1-validation_split, self.config['balanced_split'])
         num_validation_samples = int(validation_split * num_samples)
 
 
@@ -205,7 +205,7 @@ class Data(object):
             for i in all_train_indices:
                 y_train.extend(self.labels[i])
 
-            val_indices, train_indices = balanced_split(y_train, validation_split)
+            train_indices, val_indices = split(y_train, 1-validation_split, self.config['balanced_split'])
 
             x_train = []
             for i in all_train_indices:

@@ -96,6 +96,7 @@
   ],
   "position_embedding_dim": 3,
   "validation_split": 0.2,
+  "balanced_split": true,
   "window_size": 1,
   "input_dropout": 0.4,
   "lstm_units": 14,
