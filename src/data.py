@@ -471,6 +471,10 @@ class Data(object):
 
         return embedding_dict
 
+    def save_model(self, model, model_file):
+        model.save(model_file)
+        self.save_features(model_file + '_ft.pickle')
+
     def save_features(self, file_name):
         with open(file_name, 'wb') as f:
             pickle.dump({

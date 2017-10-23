@@ -25,6 +25,7 @@ IRRELEVANT_CLASS = 'n/a'
 
 
 def train_model(model, config, training_data):
+    print('Training model.')
     # compute balanced class weights
     if config['binary']:
         class_w = class_weight.compute_class_weight('balanced', np.array([0, 1]), training_data['y_train'])
@@ -73,14 +74,11 @@ def run(config, input_files_index = None, output_file=None, token_sequences_file
                  irrelevant_class = IRRELEVANT_CLASS, single_class=config['single_class'], token_sequences_file_name=token_sequences_file_name,
                  file_to_save_token_sequences=file_to_save_token_sequences, cv=cv, input_format=input_format)
 
-
-    print('Training model.')
-
     if train:
         run_train(config, data, model_file)
 
     elif cv:
-        run_cv(config, data)
+        run_cv(config, data, model_file)
     else:
         run_pipe(config, data, model_file, output_file=output_file, output_format=output_format)
 
@@ -146,16 +144,17 @@ def run_pipe(config, data, model_file, output_file, output_format):
     # model.predict(x_test)
 
 
-def run_cv(config, data):
+def run_cv(config, data, model_file=None):
     data.load()
     fold_idx = 0
     cv_results = []
     acc_list = []
-    model = branched_bi_gru_lstm.get_model(config, data)
-    model.summary()
+
     for fold_data in data.get_cv_folds_data(config['validation_split']):
         print("Running Fold", fold_idx + 1)
         fold_idx += 1
+        model = branched_bi_gru_lstm.get_model(config, data)
+        # model.summary()
         train_model(model, config, fold_data)
         x_test = branched_bi_gru_lstm.get_cv_x_test(fold_data)
         y_pred = model.predict(x_test)
@@ -165,6 +164,8 @@ def run_cv(config, data):
         p_r_f, acc = print_stats(fold_data['y_test'], y_pred, data.labels_index, config['binary'])
         acc_list.append(acc)
         cv_results.append(p_r_f)
+        if model_file:
+            data.save_model(model, model_file+"_fold_"+str(fold_idx))
     cv_prf = merge_several_folds_results(cv_results, fold_idx)
     print_p_r_f(cv_prf, data.labels_index)
 
@@ -188,8 +189,8 @@ def run_train(config, data, model_file):
 
     p_r_f, acc = print_stats(y_test, y_pred, data.labels_index, config['binary'])
     if model_file:
-        model.save(model_file)
-        data.save_features(model_file + '_ft.pickle')
+        data.save_model(model, model_file)
+
     sys.stdout = mystdout = StringIO()
     model.summary()
     sys.stdout = sys.__stdout__
@@ -222,7 +223,7 @@ def go():
     parser.add_option('-o', '--output-format', type='string', action='store',
                       dest='output_format',
                       help='output format, default same as input format', default=None)
-    parser.add_option('--file-to-save-token_sequences', type='string', action='store',
+    parser.add_option('--file-to-save-token-sequences', type='string', action='store',
                       dest='file_to_save_token_sequences',
                       help='file to save processed token sequences (not vectors), useful for training', default=None)
     parser.add_option('--token-sequences-file', type='string', action='store',
