@@ -27,7 +27,7 @@ class Data(object):
         self.window_size = window_size
         self.max_sequence_length = self.window_size * 2 + 1
 
-        self.liner = Liner2(config['liner']['config'])
+        self.liner = Liner2(config['liner']['config'], config['liner']['jar'], config['liner']['lib'])
 
         self.w2v_embeddings = {}
         self.ft_embeddings = {}
@@ -484,7 +484,7 @@ class Data(object):
             loaded = pickle.load(fp)
             self.indexed_features = loaded['indexed_features']
             self.labels_index = loaded['labels_index']
-        print(self.indexed_features)
+
 
 
     def load_embeddings(self):

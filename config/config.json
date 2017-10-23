@@ -5,6 +5,8 @@
   "single_class": false,
   "binary": false,
   "liner": {
+    "jar": "/home/michal/dev/ipi/liner2/g419-liner2-cli/build/libs/g419-liner2-cli-2.5-SNAPSHOT-all.jar",
+    "lib": "/home/michal/dev/ipi/liner2/lib",
     "config": "/home/michal/dev/ipi/sytuacje/liner2_models/baseline/cfg.ini"
   },
   "w2v_embeddings": {

@@ -222,6 +222,12 @@ def go():
     parser.add_option('-o', '--output-format', type='string', action='store',
                       dest='output_format',
                       help='output format, default same as input format', default=None)
+    parser.add_option('--file-to-save-token_sequences', type='string', action='store',
+                      dest='file_to_save_token_sequences',
+                      help='file to save processed token sequences (not vectors), useful for training', default=None)
+    parser.add_option('--token-sequences-file', type='string', action='store',
+                      dest='token_sequences_file_name',
+                      help='file with saved processed token sequences (not vectors), useful for training', default=None)
     (options, args) = parser.parse_args()
     fn_output = None
     if options.train or options.eval:
@@ -244,10 +250,9 @@ def go():
     if not options.output_format:
         options.output_format = options.input_format
 
-    # run(config, fn_input, fn_output, model_file=options.model, token_sequences_file_name='/home/michal/dev/ipi/sytuacje/workspace/deep/saved_sequences/cv11111111111', train=options.train, cv = options.eval)
+
     run(config, fn_input, fn_output, model_file=options.model, train=options.train, cv = options.eval, input_format=options.input_format, output_format = options.output_format,
-         # file_to_save_token_sequences = 'saved_sequences')
-        token_sequences_file_name='saved_sequences')
+         file_to_save_token_sequences = options.file_to_save_token_sequences, token_sequences_file_name=options.token_sequences_file_name)
 
 if __name__ == '__main__':
     go()

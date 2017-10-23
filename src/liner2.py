@@ -3,10 +3,14 @@
 from jpype import *
 import corpus2
 
-startJVM(getDefaultJVMPath(), "-Djava.library.path=/home/michal/dev/ipi/liner2/lib", "-Djava.class.path=/home/michal/dev/ipi/liner2/g419-liner2-cli/build/libs/g419-liner2-cli-2.5-SNAPSHOT-all.jar")
+
+def start_jvm(liner_jar, liner_lib):
+    startJVM(getDefaultJVMPath(), "-Djava.library.path="+liner_lib, "-Djava.class.path="+liner_jar)
 
 class Liner2(object):
-    def __init__(self, liner_ini, tagset='nkjp'):
+    def __init__(self, liner_ini, liner_jar, liner_lib, tagset='nkjp'):
+        start_jvm(liner_jar, liner_lib)
+
         self.tagset = corpus2.get_named_tagset(tagset)
         ChunkerFactory = JClass("g419.liner2.api.chunker.factory.ChunkerFactory")
         self.options = JClass("g419.liner2.api.LinerOptions")()
@@ -141,7 +145,8 @@ class Liner2(object):
         JClass("g419.corpus.io.writer.WriterFactory").get().getStreamWriter(output_file, output_format)
 
 class LinerWordnet(object):
-    def __init__(self, path):
+    def __init__(self, path, liner_jar, liner_lib):
+        start_jvm(liner_jar, liner_lib)
         self.database = JClass("g419.liner2.api.features.tokens.WordnetLoader")(path)
 
     def get_hypernym_feature(self, name, distance):

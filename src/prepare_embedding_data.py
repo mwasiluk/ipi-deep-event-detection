@@ -78,6 +78,14 @@ def go():
     parser.add_option('-l', '--limit', type='int', action='store',
                       dest='limit', default=0,
                       help='set the tokens number limit; default: 0')
+    parser.add_option('--liner_jar', type='string', action='store',
+                      dest='liner_jar',
+                      default='/home/michal/dev/ipi/liner2/g419-liner2-cli/build/libs/g419-liner2-cli-2.5-SNAPSHOT-all.jar',
+                      help='liner jar path, required for wordnet features')
+    parser.add_option('--liner_lib', type='string', action='store',
+                      dest='liner_lib',
+                      default='/home/michal/dev/ipi/liner2/lib',
+                      help='liner lib path, required for wordnet features')
     (options, args) = parser.parse_args()
     if len(args) != 2:
         print 'Need to provide input and output.'
@@ -86,13 +94,16 @@ def go():
         sys.exit(1)
     fn_input, fn_output = args
 
-    wordnet = LinerWordnet(options.wordnet_path)
+    def get_wordnet():
+        return LinerWordnet(options.wordnet_path, options.liner_jar, options.liner_lib)
 
     feature_generator = None
     if options.feature.startswith("hypernym"):
+        wordnet = get_wordnet()
         feat = wordnet.get_hypernym_feature(options.feature, int(options.feature.split("-")[1]))
         def feature_generator(tok): return unicode(feat.generate(lemstrings_of_token(tok)))
     if options.feature.startswith("synonym"):
+        wordnet = get_wordnet()
         feat = wordnet.get_synonym_feature()
         def feature_generator(tok): return unicode(feat.generate(lemstrings_of_token(tok)))
     if options.feature == 'ctag':
