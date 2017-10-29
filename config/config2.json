@@ -1,7 +1,7 @@
 {
   "seed": 1337,
   "batch_size": 2024,
-  "epochs": 75,
+  "epochs": 50,
   "single_class": false,
   "binary": false,
   "liner": {
@@ -21,7 +21,7 @@
       "path": "/home/michal/dev/ipi/embeddings/lemma/w2v_allwiki_nkjpfull_300.model",
       "enabled": true,
       "attributes": [
-        "base"
+        "base", "synonym", "hypernym-1"
       ]
     },
     "lemma.class": {
